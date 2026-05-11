@@ -1,0 +1,115 @@
+// index.js
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+
+// App.js
+import React, { useState } from "react";
+
+const products = [
+  { id: 1, name: "Laptop Gamer", price: 1200, image: "💻" },
+  { id: 2, name: "Smartphone", price: 800, image: "📱" },
+  { id: 3, name: "Auriculares", price: 150, image: "🎧" },
+  { id: 4, name: "Smartwatch", price: 200, image: "⌚" }
+];
+
+function ProductCard({ product, addToCart, addToWishlist }) {
+  return (
+    <div style={{ border: "1px solid #ccc", padding: 10, margin: 10 }}>
+      <h3>{product.image} {product.name}</h3>
+      <p>Precio: ${product.price}</p>
+      <button onClick={() => addToCart(product)}>Agregar al carrito</button>
+      <button onClick={() => addToWishlist(product)}>❤️ Wishlist</button>
+    </div>
+  );
+}
+
+function Wishlist({ wishlist }) {
+  return (
+    <div>
+      <h2>Mi Wishlist</h2>
+      {wishlist.length === 0 ? <p>No hay productos guardados.</p> : (
+        wishlist.map(item => <p key={item.id}>{item.name}</p>)
+      )}
+    </div>
+  );
+}
+
+function Cart({ cart }) {
+  const total = cart.reduce((acc, item) => acc + item.price, 0);
+
+  return (
+    <div>
+      <h2>Carrito de Compras</h2>
+      {cart.length === 0 ? <p>Tu carrito está vacío.</p> : (
+        <>
+          {cart.map(item => <p key={item.id}>{item.name} - ${item.price}</p>)}
+          <h3>Total: ${total}</h3>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Checkout() {
+  const [form, setForm] = useState({ name: "", card: "" });
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSuccess(true);
+  };
+
+  return (
+    <div>
+      <h2>Pasarela de Pago</h2>
+      {success ? <p>✅ Pago exitoso. ¡Gracias por tu compra!</p> : (
+        <form onSubmit={handleSubmit}>
+          <input 
+            type="text" 
+            placeholder="Nombre" 
+            onChange={(e) => setForm({ ...form, name: e.target.value })} 
+          />
+          <input 
+            type="text" 
+            placeholder="Número de tarjeta" 
+            onChange={(e) => setForm({ ...form, card: e.target.value })} 
+          />
+          <button type="submit">Pagar</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+
+  const addToCart = (product) => setCart([...cart, product]);
+  const addToWishlist = (product) => setWishlist([...wishlist, product]);
+
+  return (
+    <div>
+      <h1>🛍️ Mi E-Shop</h1>
+      <div style={{ display: "flex", flexWrap: "wrap" }}>
+        {products.map(p => (
+          <ProductCard 
+            key={p.id} 
+            product={p} 
+            addToCart={addToCart} 
+            addToWishlist={addToWishlist} 
+          />
+        ))}
+      </div>
+      <Wishlist wishlist={wishlist} />
+      <Cart cart={cart} />
+      <Checkout />
+    </div>
+  );
+}
+
+export default App;
